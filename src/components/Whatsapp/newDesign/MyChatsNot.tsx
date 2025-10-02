@@ -1,0 +1,85 @@
+import React, { useState } from "react";
+import AggMessage from "../../assets/aggMessageBlue.svg";
+import Buscador from "../../assets/buscador.svg";
+import NotMyChats from "./NotMyChats";
+import LinkWhatsappModal from "./linkWhatsappModal";
+
+const MisChatsList = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  return (
+    <div>
+      <div
+        className="w-[320px] max-w-full bg-white flex flex-col pl-5 pr-3.5 pt-[22px] border-[#1D2EB6]"
+        style={{ fontFamily: "Montserrat" }}
+      >
+        {/* Encabezado */}
+        <div className="flex flex-col">
+          <div className="flex items-center justify-between">
+            <div className="flex gap-3 items-center justify-center relative">
+              <div className="flex flex-col">
+                <h2 className="font-bold text-[32px] leading-[35.2px] tracking-normal text-[#1D2EB6]">
+                  Mis chats
+                </h2>
+              </div>
+              <div
+                className="w-[17px] h-[17px] rounded-full p-1 mt-1.5 bg-[#DBEAFF] flex items-center justify-center cursor-pointer relative"
+                onClick={() => setIsModalOpen(true)}
+              >
+                <img src="/dropdown.png" alt="" />
+              </div>
+
+              {isModalOpen && (
+                <div>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setIsModalOpen(false)}
+                    style={{ background: "transparent" }}
+                  />
+                  <div
+                    className="fixed z-50"
+                    style={{
+                      left: "calc(50% + -410px)",
+                      top: "145px",
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <LinkWhatsappModal />
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="mt-1.5 flex items-center justify-center">
+              <AggMessage className="w-[24px] h-[24px] cursor-pointer" />
+            </div>
+          </div>
+          <div>
+            <h2 className=" text-[12px] text-[#676767] ">Todos los chats</h2>
+          </div>
+        </div>
+
+        {/* Buscador */}
+        <div className="flex relative mt-3">
+          <input
+            type="text"
+            placeholder="Buscar"
+            className="w-full h-[38px] px-3 py-2.5 border 
+            border-[#CBD5E1] rounded-[8px] text-[12px] focus:outline-none
+            focus:ring-2 focus:ring-blue-500"
+          />
+          <Buscador
+            className="w-[22px] h-[22px] text-[#1D2EB6] 
+          absolute right-3 top-1/2 transform -translate-y-1/2"
+          />
+        </div>
+      </div>
+
+      {/* Lista de chats */}
+      <div className="overflow-y-auto custom-scrollbar">
+        <NotMyChats />
+      </div>
+    </div>
+  );
+};
+
+export default MisChatsList;
