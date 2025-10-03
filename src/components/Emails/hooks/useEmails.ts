@@ -12,6 +12,7 @@ import { useAuthStore } from "@/store/authStore";
 
 export const useEmails = (cuentasGmail: ICuentaGmail[], userId: number) => {
   const [initLoading, setInitLoading] = useState(true);
+  const [openSearch, setOpenSearch] = useState(false);
   const [viewAll, setViewAll] = useState(true);
   const { accessToken } = useAuthStore();
 
@@ -62,6 +63,18 @@ export const useEmails = (cuentasGmail: ICuentaGmail[], userId: number) => {
   ) => {
     setSearchTerm(event.target.value);
     setPage(1);
+    if (event.target.value === "") {
+      setList({
+        emails: [],
+        hasNextPage: false,
+        hasPreviousPage: false,
+        limit: 10,
+        page: 1,
+        total: 0,
+        totalPages: 0,
+      });
+      setOpenSearch(false);
+    }
   };
 
   const handleCheck = async () => {
@@ -184,6 +197,8 @@ export const useEmails = (cuentasGmail: ICuentaGmail[], userId: number) => {
   }, [page, limit]);
 
   return {
+    openSearch,
+    setOpenSearch,
     initLoading,
     list,
     page,
