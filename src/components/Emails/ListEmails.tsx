@@ -1,55 +1,110 @@
-import React from "react";
-import { Button, List, Skeleton, Pagination } from "antd";
-import { IDataEmail } from "@/interfaces/interfacesEmails";
+import React, { useState } from "react";
+import { IDataEmail, IEmail } from "@/interfaces/interfacesEmails";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { Table } from "antd";
+import { Button, Table } from "antd";
 import type { TableProps } from "antd";
+import { TableRowSelection } from "antd/es/table/interface";
+import { formatoFechaHoraHoy } from "@/utils/date";
+import {
+  DeleteOutlined,
+  MailOutlined,
+  ReloadOutlined,
+} from "@ant-design/icons";
+import "./styles.css";
 
-interface DataType {
-  key: string;
-  name: string;
-  money: string;
-  address: string;
-}
+const Tabs = ({ onClickSync }: { onClickSync: () => void }) => {
+  const columns: TableProps<IEmail>["columns"] = [
+    {
+      key: "from",
+      dataIndex: "from",
+      title: (
+        <div className="flex items-center gap-2">
+          <Button
+            type="link"
+            icon={
+              <ReloadOutlined
+                style={{ fontSize: "20px", width: "20px", height: "20px" }}
+                className="!text-blue-900"
+              />
+            }
+            onClick={onClickSync}
+          />
+          <Button
+            type="link"
+            className="!text-blue-700 !font-medium"
+            onClick={(e) => {
+              e.stopPropagation();
+              console.log("Mostrar como leido");
+            }}
+          >
+            Marcar como leido
+          </Button>
+        </div>
+      ),
+      render: (text) => <p className="!font-medium">{text}</p>,
+    },
+    {
+      key: "name",
+      dataIndex: "name",
+      render: (text) => <p className="!font-bold">{text}</p>,
+    },
+    {
+      key: "subject",
+      dataIndex: "subject",
+      render: (text) => (
+        <p className="!font-medium">
+          {" "}
+          {text.length > 20 ? text.slice(0, 20) + "..." : text}
+        </p>
+      ),
+    },
+    {
+      key: "id",
+      dataIndex: "id",
+      render: (text) => (
+        <div className="flex">
+          <Button
+            type="link"
+            size="large"
+            icon={
+              <MailOutlined
+                style={{ fontSize: "20px", width: "20px", height: "20px" }}
+                className="!text-blue-900"
+              />
+            }
+            onClick={(e) => {
+              e.stopPropagation();
+              console.log("Mostrar como leido", text);
+            }}
+          />
+          <Button
+            type="link"
+            size="large"
+            icon={
+              <DeleteOutlined
+                style={{ fontSize: "20px", width: "20px", height: "20px" }}
+                className="!text-blue-900"
+              />
+            }
+            onClick={(e) => {
+              e.stopPropagation();
+              console.log("Eliminar", text);
+            }}
+          />
+        </div>
+      ),
+    },
+    {
+      key: "date",
+      dataIndex: "date",
+      render: (text) => (
+        <p className="opacity-50">{formatoFechaHoraHoy(text)}</p>
+      ),
+    },
+  ];
 
-const columns: TableProps<DataType>["columns"] = [
-  {
-    title: "Name",
-    dataIndex: "name",
-    render: (text) => <a>{text}</a>,
-  },
-  {
-    title: "Cash Assets",
-    className: "column-money",
-    dataIndex: "money",
-    align: "right",
-  },
-  {
-    title: "Address",
-    dataIndex: "address",
-  },
-];
-
-const data: DataType[] = [
-  {
-    key: "1",
-    name: "John Brown",
-    money: "￥300,000.00",
-    address: "New York No. 1 Lake Park",
-  },
-  {
-    key: "2",
-    name: "Jim Green",
-    money: "￥1,256,000.00",
-    address: "London No. 1 Lake Park",
-  },
-  {
-    key: "3",
-    name: "Joe Black",
-    money: "￥120,000.00",
-    address: "Sydney No. 1 Lake Park",
-  },
-];
+  return columns;
+};
 
 const ListEmails = ({
   list,
@@ -59,6 +114,7 @@ const ListEmails = ({
   setPage,
   setLimit,
   router,
+  handleSync,
 }: {
   list: IDataEmail;
   initLoading: boolean;
@@ -67,47 +123,70 @@ const ListEmails = ({
   setPage: React.Dispatch<React.SetStateAction<number>>;
   setLimit: React.Dispatch<React.SetStateAction<number>>;
   router: AppRouterInstance;
+  handleSync: (cuentaGmailId: string) => Promise<void>;
 }) => {
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+
+  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
+    console.log("selectedRowKeys changed: ", newSelectedRowKeys);
+    setSelectedRowKeys(newSelectedRowKeys);
+  };
+
+  const rowSelection: TableRowSelection<IEmail> = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+    fixed: "left",
+  };
+  const columns = Tabs({ onClickSync: () => handleSync("1") });
+
   return (
-    <Table<DataType>
-      columns={columns}
-      dataSource={data}
-      bordered
-      title={() => "Header"}
-    />
-    // <div style={{ gap: "56px", display: "flex", flexDirection: "column" }}>
-    //   <List
-    //     className="demo-loadmore-list"
-    //     loading={initLoading}
-    //     itemLayout="horizontal"
+    <div className="rounded-xl overflow-hidden bg-white shadow-sm ">
+      <Table<IEmail>
+        rowSelection={rowSelection}
+        columns={columns}
+        dataSource={list.emails}
+        rowKey="id"
+        loading={initLoading}
+        pagination={{
+          className: " !p-2",
+          total: list.total,
+          showTotal: (total) => `Total ${total} emails`,
+          defaultCurrent: page,
+          pageSize: limit,
+          onChange: (page, limit) => {
+            setPage(page);
+            setLimit(limit);
+          },
+        }}
+        onRow={(record) => ({
+          onClick: () => router.push(`/dashboard/email/${record.id}`),
+        })}
+        className="custom-email-table"
+        onHeaderRow={() => ({ style: { color: "red" } })}
+      />
+    </div>
+    // <div>
+    //   {/* {hasSelected ? `Selected ${selectedRowKeys.length} items` : null} */}
+    //   <Table<IEmail>
+    //     rowKey={(record) => record.id}
+    //     rowSelection={rowSelection}
+    //     columns={columns}
     //     dataSource={list.emails}
-    //     renderItem={(item) => (
-    //       <List.Item>
-    //         <Skeleton avatar title={false} loading={false} active>
-    //           <List.Item.Meta
-    //             // avatar={<Avatar src={item.avatar} />}
-    //             title={item.name}
-    //             description={item.subject}
-    //           />
-    //           <Button
-    //             type="primary"
-    //             onClick={() => router.push(`/dashboard/email/${item.id}`)}
-    //           >
-    //             Leer mail
-    //           </Button>
-    //         </Skeleton>
-    //       </List.Item>
-    //     )}
-    //   />
-    //   <Pagination
-    //     total={list.total}
-    //     showTotal={(total) => `Total ${total} emails`}
-    //     defaultCurrent={page}
-    //     pageSize={limit}
-    //     onChange={(page, limit) => {
-    //       setPage(page);
-    //       setLimit(limit);
-    //     }}
+    //     loading={initLoading}
+    // pagination={{
+    //   total: list.total,
+    //   showTotal: (total) => `Total ${total} emails`,
+    //   defaultCurrent: page,
+    //   pageSize: limit,
+    //   onChange: (page, limit) => {
+    //     setPage(page);
+    //     setLimit(limit);
+    //   },
+    // }}
+    //     onRow={(record) => ({
+    //       className: "cursor-pointer",
+    //       onClick: () => router.push(`/dashboard/email/${record.id}`),
+    //     })}
     //   />
     // </div>
   );

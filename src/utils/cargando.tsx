@@ -42,6 +42,7 @@ export const SpinerGlobal = () => {
   return (
     <div
       style={{
+        zIndex: 9999,
         minHeight: "100vh",
         display: "flex",
         alignItems: "center",

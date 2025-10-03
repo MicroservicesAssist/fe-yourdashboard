@@ -61,6 +61,7 @@ const MyEmails = ({
           <ConnectAccountEmail conectEmail={conectEmail} />
         ) : (
           <ListEmails
+            handleSync={handleSync}
             list={list}
             initLoading={initLoading}
             page={page}
