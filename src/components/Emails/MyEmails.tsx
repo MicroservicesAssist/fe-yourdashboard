@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { handleConnectService } from "../../services/emails/emails";
 import { useEmails } from "./hooks/useEmails";
 import { ICuentaGmail } from "@/interfaces/interfacesAuth";
@@ -18,7 +18,6 @@ const MyEmails = ({
   cuentasGmail: ICuentaGmail[];
 }) => {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
 
   const {
     openSearch,
@@ -53,6 +52,9 @@ const MyEmails = ({
         cuentasGmail={cuentasGmail}
         viewAll={viewAll}
         selectedCuentaGmailId={selectedCuentaGmailId}
+        handleConnectService={handleAccountChange}
+        handleViewAll={handleViewAll}
+        conectEmail={conectEmail}
       />
       <div>
         {list.total === 0 && searchTerm !== "" ? (

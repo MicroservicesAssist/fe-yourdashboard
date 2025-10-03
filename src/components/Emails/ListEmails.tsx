@@ -165,30 +165,6 @@ const ListEmails = ({
         onHeaderRow={() => ({ style: { color: "red" } })}
       />
     </div>
-    // <div>
-    //   {/* {hasSelected ? `Selected ${selectedRowKeys.length} items` : null} */}
-    //   <Table<IEmail>
-    //     rowKey={(record) => record.id}
-    //     rowSelection={rowSelection}
-    //     columns={columns}
-    //     dataSource={list.emails}
-    //     loading={initLoading}
-    // pagination={{
-    //   total: list.total,
-    //   showTotal: (total) => `Total ${total} emails`,
-    //   defaultCurrent: page,
-    //   pageSize: limit,
-    //   onChange: (page, limit) => {
-    //     setPage(page);
-    //     setLimit(limit);
-    //   },
-    // }}
-    //     onRow={(record) => ({
-    //       className: "cursor-pointer",
-    //       onClick: () => router.push(`/dashboard/email/${record.id}`),
-    //     })}
-    //   />
-    // </div>
   );
 };
 

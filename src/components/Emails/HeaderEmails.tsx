@@ -1,9 +1,11 @@
 import React from "react";
-import { Button, Input, MenuProps, Dropdown, Space } from "antd";
+import { Button, Input, Dropdown, Space, Avatar } from "antd";
+import { PlusOutlined, MessageOutlined } from "@ant-design/icons";
 
 import { SearchOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import { ICuentaGmail } from "@/interfaces/interfacesAuth";
+import { ItemType } from "antd/es/menu/interface";
 
 const HeaderEmails = ({
   openSearch,
@@ -13,6 +15,9 @@ const HeaderEmails = ({
   cuentasGmail,
   viewAll,
   selectedCuentaGmailId,
+  handleConnectService,
+  handleViewAll,
+  conectEmail,
 }: {
   openSearch: boolean;
   setOpenSearch: React.Dispatch<React.SetStateAction<boolean>>;
@@ -21,38 +26,100 @@ const HeaderEmails = ({
   cuentasGmail: ICuentaGmail[];
   viewAll: boolean;
   selectedCuentaGmailId: string | null;
+  handleConnectService: (cuentaGmailId: string) => void;
+  handleViewAll: () => void;
+  conectEmail: () => Promise<void>;
 }) => {
-  const items: MenuProps["items"] = [
-    {
+  // Función para obtener las iniciales del nombre
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  // Función para generar un color basado en el email
+  const getAvatarColor = (email: string) => {
+    const colors = [
+      "#3b49df",
+      "#f56565",
+      "#48bb78",
+      "#ed8936",
+      "#9f7aea",
+      "#38b2ac",
+      "#e53e3e",
+      "#4299e1",
+    ];
+    const index = email.charCodeAt(0) % colors.length;
+    return colors[index];
+  };
+
+  // Crear items dinámicos de las cuentas
+  const cuentasItems = cuentasGmail
+    .filter((cuenta) => cuenta.isActive === "Activo")
+    .map((cuenta) => ({
+      key: cuenta.id,
       label: (
-        <a
-          href="https://www.antgroup.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          1st menu item
-        </a>
+        <div className="flex items-center gap-3 py-2 px-2 hover:bg-gray-50 rounded-md transition-colors">
+          <Avatar
+            size={40}
+            style={{ backgroundColor: getAvatarColor(cuenta.emailGmail) }}
+            className="flex-shrink-0 font-semibold"
+          >
+            {getInitials(cuenta.nameGmail)}
+          </Avatar>
+          <div className="flex flex-col space-y-1">
+            <span className="font-medium text-gray-900 text-base">
+              {cuenta.nameGmail}
+            </span>
+            <span className="text-gray-500 text-xs truncate">
+              {cuenta.emailGmail}
+            </span>
+          </div>
+        </div>
       ),
-      key: "0",
+      onClick: () => handleConnectService(cuenta.id),
+    }));
+
+  const menuItems: ItemType[] = [
+    ...cuentasItems,
+    {
+      type: "divider" as const,
+      className: "my-2",
     },
     {
+      key: "all-accounts",
       label: (
-        <a
-          href="https://www.aliyun.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          2nd menu item
-        </a>
+        <div className="flex items-center gap-3 py-2 px-4 hover:bg-gray-50 rounded-md transition-colors">
+          <div className="flex items-center justify-center flex-shrink-0">
+            <MessageOutlined
+              style={{ fontSize: "20px", width: "20px", height: "20px" }}
+              className="!text-blue-900"
+            />
+          </div>
+          <p className="font-medium text-gray-900 text-base">
+            Todas las cuentas
+          </p>
+        </div>
       ),
-      key: "1",
+      onClick: () => handleViewAll(),
     },
     {
-      type: "divider",
-    },
-    {
-      label: "3rd menu item",
-      key: "3",
+      key: "link-email",
+      label: (
+        <div className="flex items-center gap-3 py-2 px-4 hover:bg-gray-50 rounded-md transition-colors">
+          <div className="flex items-center justify-center flex-shrink-0">
+            <PlusOutlined
+              style={{ fontSize: "20px", width: "20px", height: "20px" }}
+              className="!text-blue-900"
+            />
+          </div>
+          <p className="font-medium text-gray-900 text-base">Vincular correo</p>
+        </div>
+      ),
+      onClick: () => conectEmail(),
     },
   ];
   return (
@@ -62,9 +129,15 @@ const HeaderEmails = ({
           <h1 className="text-3xl !font-bold !text-blue-800 m-auto">
             Mis correos
           </h1>
-          <Dropdown menu={{ items }} trigger={["click"]}>
+          <Dropdown
+            menu={{
+              items: menuItems,
+              className: "custom-dropdown-menu",
+            }}
+            trigger={["click"]}
+          >
             <a onClick={(e) => e.preventDefault()}>
-              <Space className="bg-blue-200 rounded-full p-1">
+              <Space className="bg-blue-200 rounded-full p-2 cursor-pointer hover:bg-blue-300 transition-colors">
                 <Image
                   width={15}
                   height={15}
