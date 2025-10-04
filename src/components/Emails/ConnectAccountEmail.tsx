@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "antd";
+import Image from "next/image";
 
 const ConnectAccountEmail = ({
   conectEmail,
@@ -7,10 +8,17 @@ const ConnectAccountEmail = ({
   conectEmail: () => Promise<void>;
 }) => {
   return (
-    <div style={{ textAlign: "center", padding: "50px" }}>
-      <p>Conecta una cuenta Gmail para ver tus emails</p>
-      <Button type="primary" onClick={conectEmail}>
-        Conectar cuenta Gmail
+    <div className="w-full space-y-5 mx-auto flex flex-col items-center">
+      <Image
+        src="/email-error.svg"
+        width={5000}
+        height={5000}
+        alt="imagen"
+        className="w-[369px] h-[227px]"
+      />
+      <p className="text-base">Aun no tienes correos.</p>
+      <Button size="large" type="primary" onClick={conectEmail}>
+        Vincular correo
       </Button>
     </div>
   );

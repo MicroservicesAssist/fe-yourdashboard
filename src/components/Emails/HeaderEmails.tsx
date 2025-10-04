@@ -83,45 +83,108 @@ const HeaderEmails = ({
       onClick: () => handleConnectService(cuenta.id),
     }));
 
-  const menuItems: ItemType[] = [
-    ...cuentasItems,
-    {
-      type: "divider" as const,
-      className: "my-2",
-    },
-    {
-      key: "all-accounts",
-      label: (
-        <div className="flex items-center gap-3 py-2 px-4 hover:bg-gray-50 rounded-md transition-colors">
-          <div className="flex items-center justify-center flex-shrink-0">
-            <MessageOutlined
-              style={{ fontSize: "20px", width: "20px", height: "20px" }}
-              className="!text-blue-900"
-            />
-          </div>
-          <p className="font-medium text-gray-900 text-base">
-            Todas las cuentas
-          </p>
-        </div>
-      ),
-      onClick: () => handleViewAll(),
-    },
-    {
-      key: "link-email",
-      label: (
-        <div className="flex items-center gap-3 py-2 px-4 hover:bg-gray-50 rounded-md transition-colors">
-          <div className="flex items-center justify-center flex-shrink-0">
-            <PlusOutlined
-              style={{ fontSize: "20px", width: "20px", height: "20px" }}
-              className="!text-blue-900"
-            />
-          </div>
-          <p className="font-medium text-gray-900 text-base">Vincular correo</p>
-        </div>
-      ),
-      onClick: () => conectEmail(),
-    },
-  ];
+  const menuItems: ItemType[] =
+    cuentasGmail.length === 0
+      ? [
+          {
+            key: "link-email",
+            label: (
+              <div className="flex items-center gap-3 py-2 px-4 hover:bg-gray-50 rounded-md transition-colors">
+                <div className="flex items-center justify-center flex-shrink-0">
+                  <PlusOutlined
+                    style={{ fontSize: "20px", width: "20px", height: "20px" }}
+                    className="!text-blue-900"
+                  />
+                </div>
+                <p className="font-medium text-gray-900 text-base">
+                  Vincular correo
+                </p>
+              </div>
+            ),
+            onClick: () => conectEmail(),
+          },
+        ]
+      : [
+          ...cuentasItems,
+          {
+            type: "divider" as const,
+            className: "my-2",
+          },
+          {
+            key: "all-accounts",
+            label: (
+              <div className="flex items-center gap-3 py-2 px-4 hover:bg-gray-50 rounded-md transition-colors">
+                <div className="flex items-center justify-center flex-shrink-0">
+                  <MessageOutlined
+                    style={{ fontSize: "20px", width: "20px", height: "20px" }}
+                    className="!text-blue-900"
+                  />
+                </div>
+                <p className="font-medium text-gray-900 text-base">
+                  Todas las cuentas
+                </p>
+              </div>
+            ),
+            onClick: () => handleViewAll(),
+          },
+          {
+            key: "link-email",
+            label: (
+              <div className="flex items-center gap-3 py-2 px-4 hover:bg-gray-50 rounded-md transition-colors">
+                <div className="flex items-center justify-center flex-shrink-0">
+                  <PlusOutlined
+                    style={{ fontSize: "20px", width: "20px", height: "20px" }}
+                    className="!text-blue-900"
+                  />
+                </div>
+                <p className="font-medium text-gray-900 text-base">
+                  Vincular correo
+                </p>
+              </div>
+            ),
+            onClick: () => conectEmail(),
+          },
+        ];
+
+  // const menuItems: ItemType[] = [
+  //   ...cuentasItems,
+  //   {
+  //     type: "divider" as const,
+  //     className: "my-2",
+  //   },
+  //   {
+  //     key: "all-accounts",
+  //     label: (
+  //       <div className="flex items-center gap-3 py-2 px-4 hover:bg-gray-50 rounded-md transition-colors">
+  //         <div className="flex items-center justify-center flex-shrink-0">
+  //           <MessageOutlined
+  //             style={{ fontSize: "20px", width: "20px", height: "20px" }}
+  //             className="!text-blue-900"
+  //           />
+  //         </div>
+  //         <p className="font-medium text-gray-900 text-base">
+  //           Todas las cuentas
+  //         </p>
+  //       </div>
+  //     ),
+  //     onClick: () => handleViewAll(),
+  //   },
+  //   {
+  //     key: "link-email",
+  //     label: (
+  //       <div className="flex items-center gap-3 py-2 px-4 hover:bg-gray-50 rounded-md transition-colors">
+  //         <div className="flex items-center justify-center flex-shrink-0">
+  //           <PlusOutlined
+  //             style={{ fontSize: "20px", width: "20px", height: "20px" }}
+  //             className="!text-blue-900"
+  //           />
+  //         </div>
+  //         <p className="font-medium text-gray-900 text-base">Vincular correo</p>
+  //       </div>
+  //     ),
+  //     onClick: () => conectEmail(),
+  //   },
+  // ];
   return (
     <div className="flex flex-col gap-4">
       <div className="flex justify-between">
@@ -177,7 +240,11 @@ const HeaderEmails = ({
       </div>
       <p className="-mt-3 text-gray-500 font-medium">
         {" "}
-        {viewAll ? "Todos los correos" : `Correos de la cuenta: `}
+        {cuentasGmail.length === 0
+          ? ""
+          : viewAll
+          ? "Todos los correos"
+          : `Correos de la cuenta: `}
         {cuentasGmail.find((c) => selectedCuentaGmailId?.includes(c.id))
           ?.emailGmail || ""}{" "}
       </p>
