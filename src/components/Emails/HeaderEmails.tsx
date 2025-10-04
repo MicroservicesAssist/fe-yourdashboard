@@ -146,45 +146,6 @@ const HeaderEmails = ({
           },
         ];
 
-  // const menuItems: ItemType[] = [
-  //   ...cuentasItems,
-  //   {
-  //     type: "divider" as const,
-  //     className: "my-2",
-  //   },
-  //   {
-  //     key: "all-accounts",
-  //     label: (
-  //       <div className="flex items-center gap-3 py-2 px-4 hover:bg-gray-50 rounded-md transition-colors">
-  //         <div className="flex items-center justify-center flex-shrink-0">
-  //           <MessageOutlined
-  //             style={{ fontSize: "20px", width: "20px", height: "20px" }}
-  //             className="!text-blue-900"
-  //           />
-  //         </div>
-  //         <p className="font-medium text-gray-900 text-base">
-  //           Todas las cuentas
-  //         </p>
-  //       </div>
-  //     ),
-  //     onClick: () => handleViewAll(),
-  //   },
-  //   {
-  //     key: "link-email",
-  //     label: (
-  //       <div className="flex items-center gap-3 py-2 px-4 hover:bg-gray-50 rounded-md transition-colors">
-  //         <div className="flex items-center justify-center flex-shrink-0">
-  //           <PlusOutlined
-  //             style={{ fontSize: "20px", width: "20px", height: "20px" }}
-  //             className="!text-blue-900"
-  //           />
-  //         </div>
-  //         <p className="font-medium text-gray-900 text-base">Vincular correo</p>
-  //       </div>
-  //     ),
-  //     onClick: () => conectEmail(),
-  //   },
-  // ];
   return (
     <div className="flex flex-col gap-4">
       <div className="flex justify-between">

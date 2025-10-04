@@ -11,24 +11,35 @@ import {
   ReloadOutlined,
 } from "@ant-design/icons";
 import "./styles.css";
+import SearchEmails from "./SearchEmails";
 
-const Tabs = ({ onClickSync }: { onClickSync: () => void }) => {
+const Tabs = ({
+  selectedCuentaGmailId,
+  onClickSync,
+}: {
+  selectedCuentaGmailId: string | null;
+  onClickSync: () => void;
+}) => {
   const columns: TableProps<IEmail>["columns"] = [
     {
       key: "from",
       dataIndex: "from",
       title: (
-        <div className="flex items-center gap-2">
-          <Button
-            type="link"
-            icon={
-              <ReloadOutlined
-                style={{ fontSize: "20px", width: "20px", height: "20px" }}
-                className="!text-blue-900"
-              />
-            }
-            onClick={onClickSync}
-          />
+        <div
+          className={`flex items-center ${selectedCuentaGmailId && "gap-2"}`}
+        >
+          {selectedCuentaGmailId && (
+            <Button
+              type="link"
+              icon={
+                <ReloadOutlined
+                  style={{ fontSize: "20px", width: "20px", height: "20px" }}
+                  className="!text-blue-900"
+                />
+              }
+              onClick={onClickSync}
+            />
+          )}
           <Button
             type="link"
             className="!text-blue-700 !font-medium"
@@ -115,6 +126,10 @@ const ListEmails = ({
   setLimit,
   router,
   handleSync,
+  searchTerm,
+  handleSearchTermChange,
+  handleCheck,
+  selectedCuentaGmailId,
 }: {
   list: IDataEmail;
   initLoading: boolean;
@@ -124,6 +139,10 @@ const ListEmails = ({
   setLimit: React.Dispatch<React.SetStateAction<number>>;
   router: AppRouterInstance;
   handleSync: (cuentaGmailId: string) => Promise<void>;
+  searchTerm: string;
+  handleSearchTermChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleCheck: (value: string) => void;
+  selectedCuentaGmailId: string | null;
 }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
@@ -137,33 +156,47 @@ const ListEmails = ({
     onChange: onSelectChange,
     fixed: "left",
   };
-  const columns = Tabs({ onClickSync: () => handleSync("1") });
+
+  console.log("selectedCuentaGmailId", selectedCuentaGmailId);
+  const columns = Tabs({
+    selectedCuentaGmailId: selectedCuentaGmailId,
+    onClickSync: () => handleSync(selectedCuentaGmailId as string),
+  });
 
   return (
-    <div className="rounded-xl overflow-hidden bg-white shadow-sm ">
-      <Table<IEmail>
-        rowSelection={rowSelection}
-        columns={columns}
-        dataSource={list.emails}
-        rowKey="id"
-        loading={initLoading}
-        pagination={{
-          className: " !p-2",
-          total: list.total,
-          showTotal: (total) => `Total ${total} emails`,
-          defaultCurrent: page,
-          pageSize: limit,
-          onChange: (page, limit) => {
-            setPage(page);
-            setLimit(limit);
-          },
-        }}
-        onRow={(record) => ({
-          onClick: () => router.push(`/dashboard/email/${record.id}`),
-        })}
-        className="custom-email-table"
-        onHeaderRow={() => ({ style: { color: "red" } })}
-      />
+    <div>
+      {searchTerm && (
+        <SearchEmails
+          searchTerm={searchTerm}
+          handleSearchTermChange={handleSearchTermChange}
+          handleCheck={handleCheck}
+        />
+      )}
+      <div className="rounded-xl overflow-hidden bg-white shadow-sm ">
+        <Table<IEmail>
+          rowSelection={rowSelection}
+          columns={columns}
+          dataSource={list.emails}
+          rowKey="id"
+          loading={initLoading}
+          pagination={{
+            className: " !p-2",
+            total: list.total,
+            showTotal: (total) => `Total ${total} emails`,
+            defaultCurrent: page,
+            pageSize: limit,
+            onChange: (page, limit) => {
+              setPage(page);
+              setLimit(limit);
+            },
+          }}
+          onRow={(record) => ({
+            onClick: () => router.push(`/dashboard/email/${record.id}`),
+          })}
+          className="custom-email-table"
+          onHeaderRow={() => ({ style: { color: "red" } })}
+        />
+      </div>
     </div>
   );
 };

@@ -5,8 +5,8 @@ import { ICuentaGmail } from "@/interfaces/interfacesAuth";
 import { useRouter } from "next/navigation";
 import HeaderEmails from "./HeaderEmails";
 import ListEmails from "./ListEmails";
-import SearchEmails from "./SearchEmails";
 import ConnectAccountEmail from "./ConnectAccountEmail";
+import Image from "next/image";
 
 const MyEmails = ({
   userId,
@@ -58,7 +58,18 @@ const MyEmails = ({
       />
       <div>
         {list.total === 0 && searchTerm !== "" ? (
-          <SearchEmails searchTerm={searchTerm} />
+          <div className="w-full space-y-5 mx-auto flex flex-col items-center">
+            <Image
+              src="/email-error.svg"
+              width={5000}
+              height={5000}
+              alt="imagen"
+              className="w-[369px] h-[227px]"
+            />
+            <p className="text-base">
+              No se encontraron emails con el termino: {searchTerm}
+            </p>
+          </div>
         ) : list.total === 0 ? (
           <ConnectAccountEmail conectEmail={conectEmail} />
         ) : (
@@ -71,6 +82,10 @@ const MyEmails = ({
             setPage={setPage}
             setLimit={setLimit}
             router={router}
+            searchTerm={searchTerm}
+            handleSearchTermChange={handleSearchTermChange}
+            handleCheck={handleCheck}
+            selectedCuentaGmailId={selectedCuentaGmailId}
           />
         )}
       </div>
