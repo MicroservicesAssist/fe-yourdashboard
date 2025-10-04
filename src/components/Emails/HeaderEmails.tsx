@@ -6,6 +6,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import { ICuentaGmail } from "@/interfaces/interfacesAuth";
 import { ItemType } from "antd/es/menu/interface";
+import SendEmail from "./SendEmail";
 
 const HeaderEmails = ({
   openSearch,
@@ -30,6 +31,7 @@ const HeaderEmails = ({
   handleViewAll: () => void;
   conectEmail: () => Promise<void>;
 }) => {
+  const [openNewEmailModal, setOpenNewEmailModal] = React.useState(false);
   // Función para obtener las iniciales del nombre
   const getInitials = (name: string) => {
     return name
@@ -173,31 +175,42 @@ const HeaderEmails = ({
           </Dropdown>
         </div>
 
-        <div className="flex items-center gap-5">
-          <div className="flex items-center w-full">
-            {openSearch ? (
-              <Input.Search
-                allowClear
-                placeholder="Buscar..."
-                onChange={handleSearchTermChange}
-                onSearch={handleCheck}
-                size="large"
-              />
-            ) : (
-              <Button
-                color="primary"
-                variant="outlined"
-                icon={<SearchOutlined />}
-                size="large"
-                onClick={() => setOpenSearch(true)}
-              />
+        {cuentasGmail.length === 0 ? (
+          ""
+        ) : (
+          <div className="flex items-center gap-5">
+            <div className="flex items-center w-full">
+              {openSearch ? (
+                <Input.Search
+                  allowClear
+                  placeholder="Buscar..."
+                  onChange={handleSearchTermChange}
+                  onSearch={handleCheck}
+                  size="large"
+                />
+              ) : (
+                <Button
+                  color="primary"
+                  variant="outlined"
+                  icon={<SearchOutlined />}
+                  size="large"
+                  onClick={() => setOpenSearch(true)}
+                />
+              )}
+            </div>
+
+            <Button
+              size="large"
+              type="primary"
+              onClick={() => setOpenNewEmailModal(true)}
+            >
+              Nuevo correo
+            </Button>
+            {openNewEmailModal && (
+              <SendEmail type="new" setModal={setOpenNewEmailModal} />
             )}
           </div>
-
-          <Button size="large" type="primary">
-            Nuevo correo
-          </Button>
-        </div>
+        )}
       </div>
       <p className="-mt-3 text-gray-500 font-medium">
         {" "}
