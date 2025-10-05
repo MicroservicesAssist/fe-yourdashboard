@@ -15,6 +15,7 @@ import TextAlign from "@tiptap/extension-text-align";
 import Link from "@tiptap/extension-link";
 import { FontFamily, TextStyle } from "@tiptap/extension-text-style";
 import TiptapToolbar from "./TiptapToolbar";
+import { ActionToolbarEmail } from "./ActionToolbarEmail";
 
 type FieldType = {
   username?: string;
@@ -91,6 +92,13 @@ const SendEmail = ({
       });
     },
   });
+
+  const setLink = () => {
+    const url = window.prompt("URL del enlace:");
+    if (url) {
+      editor?.chain().focus().setLink({ href: url }).run();
+    }
+  };
 
   const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
     console.log("Success:", values);
@@ -241,13 +249,8 @@ const SendEmail = ({
               <div className="flex gap-x-10">
                 <TiptapToolbar editor={editor} activeFormats={activeFormats} />
               </div>
-              <div className="flex items-center justify-between">
-                <Form.Item label={null}>
-                  <Button type="primary" size="large" htmlType="submit">
-                    Enviar
-                  </Button>
-                </Form.Item>
-              </div>
+
+              <ActionToolbarEmail onInsertLink={setLink} />
             </Form>
           )}
         </div>

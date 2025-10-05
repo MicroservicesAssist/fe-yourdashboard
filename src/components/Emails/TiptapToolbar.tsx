@@ -9,7 +9,6 @@ import {
   AlignRightOutlined,
   OrderedListOutlined,
   UnorderedListOutlined,
-  LinkOutlined,
   RollbackOutlined,
   FontSizeOutlined,
 } from "@ant-design/icons";
@@ -31,13 +30,6 @@ const TiptapToolbar = ({ editor, activeFormats }: any) => {
       </button>
     </Tooltip>
   );
-
-  const setLink = () => {
-    const url = window.prompt("URL del enlace:");
-    if (url) {
-      editor.chain().focus().setLink({ href: url }).run();
-    }
-  };
 
   return (
     <div className="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-md shadow-blue-600/50">
@@ -311,22 +303,6 @@ const TiptapToolbar = ({ editor, activeFormats }: any) => {
         />
 
         <Divider type="vertical" className="h-6 mx-1" />
-
-        {/* Link */}
-        <ButtonStyle
-          active={editor.isActive("link")}
-          onClick={setLink}
-          icon={
-            <LinkOutlined
-              style={{
-                fontSize: "20px",
-                width: "20px",
-                height: "20px",
-              }}
-            />
-          }
-          tooltip="Insertar enlace"
-        />
       </div>
 
       <style jsx global>{`
