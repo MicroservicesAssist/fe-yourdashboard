@@ -131,7 +131,7 @@ const SendEmail = ({
       <div
         className={`${
           fullScreen &&
-          "px-20 py-10 w-full h-full bg-black/50 fixed top-0 left-0 !z-[9999] flex items-center justify-center"
+          "px-20 py-10 w-full h-full bg-black/50 fixed top-0 left-0 !z-[1000] flex items-center justify-center"
         }`}
       >
         <div

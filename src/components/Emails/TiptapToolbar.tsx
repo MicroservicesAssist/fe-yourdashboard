@@ -32,7 +32,7 @@ const TiptapToolbar = ({ editor, activeFormats }: any) => {
   );
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-md shadow-blue-600/50">
+    <div className="w-full mx-auto bg-white rounded-xl shadow-md shadow-blue-600/50">
       {/* Toolbar */}
       <div className="flex items-center gap-1 p-1 border-b border-gray-200 bg-white rounded-t-lg ">
         {/* Undo / Redo */}
@@ -73,7 +73,6 @@ const TiptapToolbar = ({ editor, activeFormats }: any) => {
         {/* Font Family */}
         <Select
           defaultValue="Montserrat"
-          style={{ width: 100 }}
           size="small"
           onChange={(value) =>
             editor.chain().focus().setFontFamily(value).run()
