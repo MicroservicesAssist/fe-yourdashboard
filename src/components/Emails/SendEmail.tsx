@@ -4,6 +4,7 @@ import { Button, Form, FormProps, Input } from "antd";
 import {
   ArrowsAltOutlined,
   CloseOutlined,
+  EnterOutlined,
   MinusOutlined,
   ShrinkOutlined,
 } from "@ant-design/icons";
@@ -26,9 +27,11 @@ type FieldType = {
 const SendEmail = ({
   type,
   setModal,
+  subject,
 }: {
   type: "new" | "reply" | "forward";
   setModal: React.Dispatch<React.SetStateAction<boolean>>;
+  subject?: string | undefined;
 }) => {
   const [fullScreen, setFullScreen] = React.useState(false);
   const [minScreen, setMinScreen] = React.useState(false);
@@ -142,11 +145,23 @@ const SendEmail = ({
         >
           {/* Modal Header */}
           <div className="flex items-center justify-between px-6 py-3 rounded-t-lg bg-[#EBF4FF]">
-            <h3 className="text-base font-semibold text-[#1D2EB6]">
+            <h3 className="text-base font-semibold text-[#1D2EB6] my-auto">
+              {subject && (
+                <EnterOutlined
+                  className="rotate-x-180"
+                  style={{
+                    color: "#1D2EB6",
+                    fontSize: 20,
+                    width: 20,
+                    height: 20,
+                    marginRight: 10,
+                  }}
+                />
+              )}
               {type === "new"
                 ? "Mensaje nuevo"
                 : type === "reply"
-                ? "Responder a "
+                ? `Responder a ${subject}`
                 : "Reenviar"}
             </h3>
             <div className="flex items-center gap-2">
