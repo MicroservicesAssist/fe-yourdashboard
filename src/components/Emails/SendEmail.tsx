@@ -1,6 +1,6 @@
 "use client";
-import React from "react";
-import { Button, Form, FormProps, Input } from "antd";
+import React, { useState } from "react";
+import { Button, Form, FormProps, Input, message } from "antd";
 import {
   ArrowsAltOutlined,
   CloseOutlined,
@@ -18,22 +18,34 @@ import { FontFamily, TextStyle } from "@tiptap/extension-text-style";
 import TiptapToolbar from "./TiptapToolbar";
 import { ActionToolbarEmail } from "./ActionToolbarEmail";
 import { Image } from "@tiptap/extension-image";
+import { useAuthStore } from "@/store/authStore";
+import { postResponseEmail, postSendNewEmail } from "@/services/emails/emails";
 
-type FieldType = {
-  username?: string;
-  password?: string;
-  remember?: string;
-};
+interface IEmailSend {
+  from?: string;
+  to?: string;
+  subject?: string;
+  body?: string;
+  bodyHtml?: string;
+}
+
+interface IEmailResponse {
+  body?: string;
+  bodyHtml?: string;
+}
 
 const SendEmail = ({
   type,
   setModal,
   subject,
+  emailId,
 }: {
   type: "new" | "reply" | "forward";
   setModal: React.Dispatch<React.SetStateAction<boolean>>;
   subject?: string | undefined;
+  emailId?: string | undefined;
 }) => {
+  const { accessToken, userProfile } = useAuthStore();
   const [fullScreen, setFullScreen] = React.useState(false);
   const [minScreen, setMinScreen] = React.useState(false);
   const [activeFormats, setActiveFormats] = React.useState({
@@ -46,6 +58,9 @@ const SendEmail = ({
     bulletList: false,
     orderedList: false,
   });
+
+  const [editorContent, setEditorContent] = useState("<p>Mensaje...</p>");
+  const form = Form.useForm()[0]; // Obtener instancia del form
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -73,6 +88,12 @@ const SendEmail = ({
     },
     content: "<p>Mensaje...</p>",
     onUpdate: ({ editor }) => {
+      const html = editor.getHTML();
+      const plainText = editor.getText(); // ✅ Texto sin HTML
+
+      setEditorContent(html);
+      form.setFieldValue("bodyHtml", html);
+      form.setFieldValue("body", plainText); // ✅ Agregar texto plano
       setActiveFormats({
         bold: editor.isActive("bold"),
         italic: editor.isActive("italic"),
@@ -98,14 +119,65 @@ const SendEmail = ({
     },
   });
 
-  const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
-    console.log("Success:", values);
+  const onFinishSend: FormProps<IEmailSend>["onFinish"] = async (values) => {
+    try {
+      // ✅ Separar por comas y limpiar espacios
+      const toEmails = values.to
+        ? values.to
+            .split(",")
+            .map((email) => email.trim())
+            .filter((email) => email)
+        : [];
+
+      // Validación adicional
+      if (toEmails.length === 0) {
+        message.error("Debe especificar al menos un destinatario");
+        return;
+      }
+
+      if (toEmails.length > 50) {
+        message.error("Máximo 50 destinatarios permitidos");
+        return;
+      }
+
+      const response = await postSendNewEmail(
+        accessToken || "",
+        userProfile?.cuentas_gmail[0].email_gmail || "",
+        toEmails, // ✅ Ahora es ["email1@gmail.com", "email2@gmail.com"]
+        values.subject || "",
+        values.body || "",
+        values.bodyHtml || ""
+      );
+
+      if (response) {
+        message.success("Correo enviado con éxito");
+        setModal(false);
+      }
+    } catch (error) {
+      console.error("Error al enviar:", error);
+      message.error("Error al enviar el correo");
+    }
   };
 
-  const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
-    errorInfo
+  const onFinishResponse: FormProps<IEmailResponse>["onFinish"] = async (
+    values
   ) => {
-    console.log("Failed:", errorInfo);
+    try {
+      const response = await postResponseEmail(
+        accessToken || "",
+        emailId || "",
+        values.body || "",
+        values.bodyHtml || ""
+      );
+
+      if (response) {
+        message.success("Correo enviado con éxito");
+        setModal(false);
+      }
+    } catch (error) {
+      console.error("Error al enviar:", error);
+      message.error("Error al enviar el correo");
+    }
   };
 
   const handleFullScreen = () => {
@@ -200,11 +272,9 @@ const SendEmail = ({
           {/* Reply Form */}
           {!minScreen && (
             <Form
+              form={form}
               name="basic"
-              // initialValues={{ remember: true }}
-              onFinish={onFinish}
-              onFinishFailed={onFinishFailed}
-              // autoComplete="off"
+              onFinish={type === "new" ? onFinishSend : onFinishResponse}
               className="!space-y-10 !mt-10 !px-10 !flex-1 !flex !flex-col !overflow-hidden"
             >
               {type === "new" && (
@@ -215,14 +285,26 @@ const SendEmail = ({
                         Para
                       </span>
                     }
-                    // name="username"
+                    name="to"
                     rules={[
                       {
                         required: true,
-                        message: "Please input your username!",
+                        message: "Por favor ingrese al menos un correo",
+                      },
+                      {
+                        validator: (_, value) => {
+                          const emails = value
+                            .split(",")
+                            .map((e: string) => e.trim());
+                          if (emails.length > 50) {
+                            return Promise.reject("Máximo 50 destinatarios");
+                          }
+                          return Promise.resolve();
+                        },
                       },
                     ]}
                     className="!px-5"
+                    tooltip="Separa múltiples emails con comas"
                   >
                     <Input size="large" />
                   </Form.Item>
@@ -232,7 +314,7 @@ const SendEmail = ({
                         Asunto
                       </span>
                     }
-                    // name="username"
+                    name="subject"
                     rules={[
                       {
                         required: true,
@@ -245,6 +327,14 @@ const SendEmail = ({
                   </Form.Item>
                 </>
               )}
+              {/* Campo oculto para el HTML del editor */}
+              <Form.Item name="body" hidden initialValue="">
+                <Input type="hidden" />
+              </Form.Item>
+
+              <Form.Item name="bodyHtml" hidden initialValue={editorContent}>
+                <Input type="hidden" />
+              </Form.Item>
 
               {/* Message Input */}
               <div className="border border-gray-200 rounded-xl flex-1 px-4 py-3 overflow-scroll">

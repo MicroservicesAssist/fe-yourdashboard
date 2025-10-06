@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Dropdown, MenuProps } from "antd";
+import { Button, Dropdown, MenuProps, Tooltip } from "antd";
 import {
   ArrowLeftOutlined,
   DeleteOutlined,
@@ -18,6 +18,8 @@ import { useRouter } from "next/navigation";
 import SendEmail from "./SendEmail";
 import { formatoDeFechaYHora } from "@/utils/date";
 import { SpinerGlobal } from "@/utils/cargando";
+//import { useEmails } from "./hooks/useEmails";
+// import { ICuentaGmail } from "@/interfaces/interfacesAuth";
 
 const SVGReenviar = () => {
   return (
@@ -51,10 +53,17 @@ const SVGReenviar = () => {
 const DetailsEmail = ({
   emailId,
   token,
-}: {
+}: // cuentasGmail,
+// userId,
+{
   emailId: string;
   token: string;
+  // cuentasGmail: ICuentaGmail[];
+  // userId: number;
 }) => {
+  // const { list } = useEmails(cuentasGmail, userId);
+  // console.log("list", list);
+
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const [showReplyModal, setShowReplyModal] = useState(false);
@@ -227,20 +236,22 @@ const DetailsEmail = ({
             }
             onClick={() => router.back()}
           />
-          <Button
-            type="text"
-            icon={
-              <DeleteOutlined
-                style={{
-                  color: "#1D2EB6",
-                  fontSize: 20,
-                  width: 20,
-                  height: 20,
-                }}
-              />
-            }
-            //     onClick={() => router.back()}
-          />
+          <Tooltip title="Eliminar">
+            <Button
+              type="text"
+              icon={
+                <DeleteOutlined
+                  style={{
+                    color: "#1D2EB6",
+                    fontSize: 20,
+                    width: 20,
+                    height: 20,
+                  }}
+                />
+              }
+              //     onClick={() => router.back()}
+            />
+          </Tooltip>
         </div>
 
         <div className="flex items-center space-x-2">
@@ -388,6 +399,7 @@ const DetailsEmail = ({
           type="reply"
           setModal={setShowReplyModal}
           subject={emailDetails.subject}
+          emailId={emailId}
         />
       )}
     </div>

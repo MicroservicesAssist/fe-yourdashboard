@@ -130,8 +130,6 @@ export const getEmailDetails = async (token: string, emailId: string) => {
 };
 
 export const postEmailSync = async (token: string, cuentaGmailId: string) => {
-  console.log("cuentaGmailId", cuentaGmailId);
-
   try {
     const response = await axios.post(
       `${MS_ORCHES_URL}/emails/sync/incremental`,
@@ -148,5 +146,61 @@ export const postEmailSync = async (token: string, cuentaGmailId: string) => {
     return response.data;
   } catch (error) {
     console.error("Error sincronizando email:", error);
+  }
+};
+
+export const postResponseEmail = async (
+  token: string,
+  emailId: string,
+  body: string,
+  bodyHtml: string
+) => {
+  try {
+    const response = await axios.post(
+      `${MS_ORCHES_URL}/emails/${emailId}/reply`,
+      {
+        body,
+        bodyHtml,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error respondiendo email:", error);
+  }
+};
+
+export const postSendNewEmail = async (
+  token: string,
+  from: string,
+  to: string[],
+  subject: string,
+  body: string,
+  bodyHtml: string
+) => {
+  try {
+    const response = await axios.post(
+      `${MS_ORCHES_URL}/emails/send`,
+      {
+        from,
+        to,
+        subject,
+        body,
+        bodyHtml,
+        priority: "normal",
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error enviando email:", error);
   }
 };
