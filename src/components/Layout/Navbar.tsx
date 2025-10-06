@@ -66,6 +66,7 @@ const Navbar = () => {
     <Header
       style={{
         position: "fixed",
+        minWidth: "100%",
         top: 0,
         left: 0,
         right: 0,

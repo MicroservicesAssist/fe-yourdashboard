@@ -47,7 +47,12 @@ const FormRegister = ({ setChangeForm }: FormView) => {
         }
       >
         <Input
-          prefix={<UserOutlined className="!text-blue-800" />}
+          prefix={
+            <UserOutlined
+              style={{ fontSize: "20px", width: "20px", height: "20px" }}
+              className="!text-blue-800"
+            />
+          }
           placeholder="Nombre"
           size="large"
           style={{ padding: "10px 12px" }}
@@ -57,7 +62,7 @@ const FormRegister = ({ setChangeForm }: FormView) => {
       <Form.Item
         className="w-full"
         name="whatsapp"
-        // rules={[{ required: true, message: "Por favor ingrese su nombre" }]}
+        rules={[{ required: true, message: "Por favor ingrese su nombre" }]}
         label={
           <span className="!text-blue-800 !font-bold text-base">
             Numero de Whatsapp
@@ -65,7 +70,12 @@ const FormRegister = ({ setChangeForm }: FormView) => {
         }
       >
         <Input
-          prefix={<WhatsAppOutlined className="!text-blue-800" />}
+          prefix={
+            <WhatsAppOutlined
+              style={{ fontSize: "20px", width: "20px", height: "20px" }}
+              className="!text-blue-800"
+            />
+          }
           placeholder="000000000"
           size="large"
           style={{ padding: "10px 12px" }}
@@ -81,7 +91,12 @@ const FormRegister = ({ setChangeForm }: FormView) => {
       >
         <Input
           style={{ padding: "10px 12px" }}
-          prefix={<MailOutlined className="!text-blue-800" />}
+          prefix={
+            <MailOutlined
+              style={{ fontSize: "20px", width: "20px", height: "20px" }}
+              className="!text-blue-800"
+            />
+          }
           size="large"
           placeholder="Email"
         />
@@ -98,14 +113,29 @@ const FormRegister = ({ setChangeForm }: FormView) => {
       >
         <Input.Password
           style={{ padding: "10px 12px" }}
-          prefix={<LockOutlined className="!text-blue-900" />}
+          prefix={
+            <LockOutlined
+              style={{ fontSize: "20px", width: "20px", height: "20px" }}
+              className="!text-blue-900"
+            />
+          }
           size="large"
           placeholder="Contraseña"
           iconRender={(visible) =>
             visible ? (
-              <EyeTwoTone twoToneColor="#1D2EB6" /> // azul
+              <EyeTwoTone
+                style={{ fontSize: "20px", width: "20px", height: "20px" }}
+                twoToneColor="#1D2EB6"
+              /> // azul
             ) : (
-              <EyeInvisibleOutlined style={{ color: "#1D2EB6" }} /> // azul
+              <EyeInvisibleOutlined
+                style={{
+                  color: "#1D2EB6",
+                  fontSize: "20px",
+                  width: "20px",
+                  height: "20px",
+                }}
+              /> // azul
             )
           }
         />

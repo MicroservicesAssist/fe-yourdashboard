@@ -1,196 +1,207 @@
 import React, { useState } from "react";
-import { Button, List, Skeleton, Pagination, Card, Input } from "antd";
+import { IDataEmail, IEmail } from "@/interfaces/interfacesEmails";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { Button, Table } from "antd";
+import type { TableProps } from "antd";
+import { TableRowSelection } from "antd/es/table/interface";
+import { formatoFechaHoraHoy } from "@/utils/date";
+import {
+  DeleteOutlined,
+  MailOutlined,
+  ReloadOutlined,
+} from "@ant-design/icons";
+import "./styles.css";
+import SearchEmails from "./SearchEmails";
 
-import { handleConnectService } from "../../services/emails/emails";
-import { DownOutlined, UpOutlined } from "@ant-design/icons";
-
-import { useEmails } from "./hooks/useEmails";
-import TabsTest from "./Tabs";
-import { ICuentaGmail } from "@/interfaces/interfacesAuth";
-import { useRouter } from "next/navigation";
-
-const ListEmails = ({
-  userId,
-  token,
-  cuentasGmail,
+const Tabs = ({
+  selectedCuentaGmailId,
+  onClickSync,
+  handleDeleteEmail,
 }: {
-  userId: number;
-  token: string;
-  cuentasGmail: ICuentaGmail[];
+  selectedCuentaGmailId: string | null;
+  onClickSync: () => void;
+  handleDeleteEmail: (emailId: string) => void;
 }) => {
-  const router = useRouter();
-  const [open, setOpen] = useState(false);
-
-  const {
-    initLoading,
-    list,
-    setPage,
-    setLimit,
-    page,
-    limit,
-    handleAccountChange,
-    handleSync,
-    handleSearchTermChange,
-    selectedCuentaGmailId,
-    handleCheck,
-    searchTerm,
-    viewAll,
-    handleViewAll,
-  } = useEmails(cuentasGmail, userId);
-  //console.log("list", list);
-  //console.log("cuentasGmail", cuentasGmail);
-
-  const conectEmail = async () => {
-    await handleConnectService(token);
-  };
-
-  return (
-    <div style={{ padding: "24px" }}>
-      {cuentasGmail.length !== 0 ? (
-        <Card
-          title={
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <h4>
-                📧 Cuentas de Gmail conectadas
-                <span> ({cuentasGmail.length})</span>
-              </h4>
-              {cuentasGmail.length > 1 && (
-                <Button type="primary" onClick={handleViewAll}>
-                  Ver todos los emails
-                </Button>
-              )}
-              <div style={{ display: "flex", gap: "16px" }}>
-                <Button type="primary" onClick={conectEmail}>
-                  Conectar mas de una cuenta
-                </Button>
-                {open ? (
-                  <Button onClick={() => setOpen(false)}>
-                    Ocultar lista de emails
-                    <UpOutlined />
-                  </Button>
-                ) : (
-                  <Button onClick={() => setOpen(true)}>
-                    Ver lista de emails
-                    <DownOutlined />
-                  </Button>
-                )}
-              </div>
-            </div>
-          }
-          style={{ marginBottom: "24px", textAlign: "center" }}
+  const columns: TableProps<IEmail>["columns"] = [
+    {
+      key: "from",
+      dataIndex: "from",
+      title: (
+        <div
+          className={`flex items-center ${selectedCuentaGmailId && "gap-2"}`}
         >
-          {open && (
-            <TabsTest
-              data={cuentasGmail}
-              handleConnectService={handleAccountChange}
-              handleSync={handleSync}
+          {selectedCuentaGmailId && (
+            <Button
+              type="link"
+              icon={
+                <ReloadOutlined
+                  style={{ fontSize: "20px", width: "20px", height: "20px" }}
+                  className="!text-blue-900"
+                />
+              }
+              onClick={onClickSync}
             />
           )}
-        </Card>
-      ) : (
-        <Card
-          title={
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <h4>📧 Cuentas de Gmail conectadas</h4>
-              <Button type="primary" onClick={conectEmail}>
-                Conectar cuenta Gmail
-              </Button>
-            </div>
-          }
-          style={{ textAlign: "center", marginBottom: "24px" }}
-        >
-          <p>No hay cuentas de Gmail conectadas</p>
-        </Card>
-      )}
-      <Card
-        title={
-          <div
-            style={{
-              marginBottom: "16px",
+          <Button
+            type="link"
+            className="!text-blue-700 !font-medium"
+            onClick={(e) => {
+              e.stopPropagation();
+              console.log("Mostrar como leido");
             }}
           >
-            <h4>
-              {viewAll ? "📧 Todos los emails" : `📧 Emails: `}
-              {cuentasGmail.find((c) => selectedCuentaGmailId?.includes(c.id))
-                ?.emailGmail || ""}{" "}
-              ({list.total})
-            </h4>
-            <div style={{ display: "flex", gap: "50px" }}>
-              <Input.Search
-                allowClear
-                placeholder="Buscar..."
-                onChange={handleSearchTermChange}
-                onSearch={handleCheck}
-                enterButton
+            Marcar como leido
+          </Button>
+        </div>
+      ),
+      render: (text) => <p className="!font-medium">{text}</p>,
+    },
+    {
+      key: "name",
+      dataIndex: "name",
+      render: (text) => <p className="!font-bold">{text}</p>,
+    },
+    {
+      key: "subject",
+      dataIndex: "subject",
+      render: (text) => (
+        <p className="!font-medium">
+          {" "}
+          {text.length > 20 ? text.slice(0, 20) + "..." : text}
+        </p>
+      ),
+    },
+    {
+      key: "id",
+      dataIndex: "id",
+      render: (text) => (
+        <div className="flex">
+          <Button
+            type="link"
+            size="large"
+            icon={
+              <MailOutlined
+                style={{ fontSize: "20px", width: "20px", height: "20px" }}
+                className="!text-blue-900"
               />
-            </div>
-          </div>
-        }
-        style={{ flex: 1 }}
-      >
-        {list.total === 0 && searchTerm !== "" ? (
-          <div style={{ textAlign: "center", padding: "50px" }}>
-            <p>No se encontraron emails con el termino: {searchTerm}</p>
-          </div>
-        ) : list.total === 0 ? (
-          <div style={{ textAlign: "center", padding: "50px" }}>
-            <p>Conecta una cuenta Gmail para ver tus emails</p>
-            <Button type="primary" onClick={conectEmail}>
-              Conectar cuenta Gmail
-            </Button>
-          </div>
-        ) : (
-          <div
-            style={{ gap: "56px", display: "flex", flexDirection: "column" }}
-          >
-            <List
-              className="demo-loadmore-list"
-              loading={initLoading}
-              itemLayout="horizontal"
-              dataSource={list.emails}
-              renderItem={(item) => (
-                <List.Item>
-                  <Skeleton avatar title={false} loading={false} active>
-                    <List.Item.Meta
-                      // avatar={<Avatar src={item.avatar} />}
-                      title={item.name}
-                      description={item.subject}
-                    />
-                    <Button
-                      type="primary"
-                      onClick={() => router.push(`/dashboard/email/${item.id}`)}
-                    >
-                      Leer mail
-                    </Button>
-                  </Skeleton>
-                </List.Item>
-              )}
-            />
-            <Pagination
-              total={list.total}
-              showTotal={(total) => `Total ${total} emails`}
-              defaultCurrent={page}
-              pageSize={limit}
-              onChange={(page, limit) => {
-                setPage(page);
-                setLimit(limit);
-              }}
-            />
-          </div>
-        )}
-      </Card>
+            }
+            onClick={(e) => {
+              e.stopPropagation();
+              console.log("Mostrar como leido", text);
+            }}
+          />
+          <Button
+            type="link"
+            size="large"
+            icon={
+              <DeleteOutlined
+                style={{ fontSize: "20px", width: "20px", height: "20px" }}
+                className="!text-blue-900"
+              />
+            }
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDeleteEmail(text);
+            }}
+          />
+        </div>
+      ),
+    },
+    {
+      key: "date",
+      dataIndex: "date",
+      render: (text) => (
+        <p className="opacity-50">{formatoFechaHoraHoy(text)}</p>
+      ),
+    },
+  ];
+
+  return columns;
+};
+
+const ListEmails = ({
+  list,
+  initLoading,
+  page,
+  limit,
+  setPage,
+  setLimit,
+  router,
+  handleSync,
+  searchTerm,
+  handleSearchTermChange,
+  handleCheck,
+  selectedCuentaGmailId,
+  handleDeleteEmail,
+}: {
+  list: IDataEmail;
+  initLoading: boolean;
+  page: number;
+  limit: number;
+  setPage: React.Dispatch<React.SetStateAction<number>>;
+  setLimit: React.Dispatch<React.SetStateAction<number>>;
+  router: AppRouterInstance;
+  handleSync: (cuentaGmailId: string) => Promise<void>;
+  searchTerm: string;
+  handleSearchTermChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleCheck: (value: string) => void;
+  selectedCuentaGmailId: string | null;
+  handleDeleteEmail: (emailId: string) => void;
+}) => {
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+
+  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
+    console.log("selectedRowKeys changed: ", newSelectedRowKeys);
+    setSelectedRowKeys(newSelectedRowKeys);
+  };
+
+  const rowSelection: TableRowSelection<IEmail> = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+    fixed: "left",
+  };
+
+  console.log("selectedCuentaGmailId", selectedCuentaGmailId);
+  const columns = Tabs({
+    selectedCuentaGmailId: selectedCuentaGmailId,
+    onClickSync: () => handleSync(selectedCuentaGmailId as string),
+    handleDeleteEmail,
+  });
+
+  return (
+    <div>
+      {searchTerm && (
+        <SearchEmails
+          searchTerm={searchTerm}
+          handleSearchTermChange={handleSearchTermChange}
+          handleCheck={handleCheck}
+        />
+      )}
+      <div className="rounded-xl overflow-hidden bg-white shadow-sm ">
+        <Table<IEmail>
+          rowSelection={rowSelection}
+          columns={columns}
+          dataSource={list.emails}
+          rowKey="id"
+          loading={initLoading}
+          pagination={{
+            className: " !p-2",
+            total: list.total,
+            showTotal: (total) => `Total ${total} emails`,
+            defaultCurrent: page,
+            pageSize: limit,
+            onChange: (page, limit) => {
+              setPage(page);
+              setLimit(limit);
+            },
+          }}
+          onRow={(record) => ({
+            onClick: () => router.push(`/dashboard/email/${record.id}`),
+          })}
+          className="custom-email-table"
+          onHeaderRow={() => ({ style: { color: "red" } })}
+        />
+      </div>
     </div>
   );
 };

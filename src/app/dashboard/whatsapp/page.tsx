@@ -90,11 +90,11 @@ export default function Home() {
       <Layout style={{ marginLeft: 260 }}>
         <Content
           style={{
-            position: "fixed",
-            top: 86, 
-            left: 260, 
-            width: "calc(100% - 260px)", 
-            height: "calc(100vh - 86px)", 
+            position: "fixed", // 🔹 Fijo igual que el Sider
+            top: 86, // 🔹 mismo offset superior
+            left: 260, // 🔹 comienza a la derecha del Sider
+            width: "calc(100% - 260px)", // 🔹 ocupa todo lo demás
+            height: "calc(100vh - 86px)", // 🔹 altura restante
             backgroundColor: "#ffffff",
             borderRight: "1px solid #e8e8e8",
             minHeight: "calc(100vh - 86px)",

@@ -33,7 +33,7 @@ const ChatWindow: React.FC<Props> = ({
 
   return (
     <div
-      className="flex flex-col flex-1 bg-[#FFFFFF] ml-1 min-h-screen"
+      className="flex flex-col flex-1 bg-[#fffffff] ml-1"
       style={{ fontFamily: "Montserrat" }}
     >
       {/* Header de la conversación */}

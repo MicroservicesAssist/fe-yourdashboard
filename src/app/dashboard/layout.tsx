@@ -54,8 +54,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       case "calendario":
         router.push("/dashboard/calendar");
         break;
-      case "correo":
+      case "correo-inbox":
         router.push("/dashboard/email");
+        break;
+      case "correo-shared":
+        router.push("/dashboard/email/shared");
         break;
       case "whatsapp":
         router.push("/dashboard/whatsapp");

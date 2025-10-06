@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import {
+  deleteEmailId,
   getAllEmails,
   getAllSearchEmails,
   getEmails,
@@ -12,6 +13,7 @@ import { useAuthStore } from "@/store/authStore";
 
 export const useEmails = (cuentasGmail: ICuentaGmail[], userId: number) => {
   const [initLoading, setInitLoading] = useState(true);
+  const [openSearch, setOpenSearch] = useState(false);
   const [viewAll, setViewAll] = useState(true);
   const { accessToken } = useAuthStore();
 
@@ -62,6 +64,18 @@ export const useEmails = (cuentasGmail: ICuentaGmail[], userId: number) => {
   ) => {
     setSearchTerm(event.target.value);
     setPage(1);
+    if (event.target.value === "") {
+      setList({
+        emails: [],
+        hasNextPage: false,
+        hasPreviousPage: false,
+        limit: 10,
+        page: 1,
+        total: 0,
+        totalPages: 0,
+      });
+      setOpenSearch(false);
+    }
   };
 
   const handleCheck = async () => {
@@ -113,6 +127,19 @@ export const useEmails = (cuentasGmail: ICuentaGmail[], userId: number) => {
       console.error("❌ Error al buscar emails:", error);
     } finally {
       setInitLoading(false);
+    }
+  };
+
+  const handleDeleteEmail = async (emailId: string) => {
+    const token = accessToken;
+    if (!token || !emailId) return;
+
+    try {
+      await deleteEmailId(token, emailId);
+      alert("Email eliminado con éxito");
+      window.location.reload();
+    } catch (error) {
+      console.error("❌ Error al eliminar email:", error);
     }
   };
 
@@ -184,6 +211,8 @@ export const useEmails = (cuentasGmail: ICuentaGmail[], userId: number) => {
   }, [page, limit]);
 
   return {
+    openSearch,
+    setOpenSearch,
     initLoading,
     list,
     page,
@@ -199,5 +228,6 @@ export const useEmails = (cuentasGmail: ICuentaGmail[], userId: number) => {
     searchTerm,
     handleViewAll,
     viewAll,
+    handleDeleteEmail,
   };
 };
