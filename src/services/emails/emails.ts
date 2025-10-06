@@ -204,3 +204,16 @@ export const postSendNewEmail = async (
     console.error("Error enviando email:", error);
   }
 };
+
+export const deleteEmailId = async (token: string, emailId: string) => {
+  try {
+    const response = await axios.delete(`${MS_ORCHES_URL}/emails/${emailId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error eliminando email:", error);
+  }
+};

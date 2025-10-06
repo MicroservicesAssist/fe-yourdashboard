@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import {
+  deleteEmailId,
   getAllEmails,
   getAllSearchEmails,
   getEmails,
@@ -129,6 +130,19 @@ export const useEmails = (cuentasGmail: ICuentaGmail[], userId: number) => {
     }
   };
 
+  const handleDeleteEmail = async (emailId: string) => {
+    const token = accessToken;
+    if (!token || !emailId) return;
+
+    try {
+      await deleteEmailId(token, emailId);
+      alert("Email eliminado con éxito");
+      window.location.reload();
+    } catch (error) {
+      console.error("❌ Error al eliminar email:", error);
+    }
+  };
+
   useEffect(() => {
     const token = accessToken;
     if (!token || !userId || searchTerm !== "") return;
@@ -214,5 +228,6 @@ export const useEmails = (cuentasGmail: ICuentaGmail[], userId: number) => {
     searchTerm,
     handleViewAll,
     viewAll,
+    handleDeleteEmail,
   };
 };

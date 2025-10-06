@@ -16,9 +16,11 @@ import SearchEmails from "./SearchEmails";
 const Tabs = ({
   selectedCuentaGmailId,
   onClickSync,
+  handleDeleteEmail,
 }: {
   selectedCuentaGmailId: string | null;
   onClickSync: () => void;
+  handleDeleteEmail: (emailId: string) => void;
 }) => {
   const columns: TableProps<IEmail>["columns"] = [
     {
@@ -99,7 +101,7 @@ const Tabs = ({
             }
             onClick={(e) => {
               e.stopPropagation();
-              console.log("Eliminar", text);
+              handleDeleteEmail(text);
             }}
           />
         </div>
@@ -130,6 +132,7 @@ const ListEmails = ({
   handleSearchTermChange,
   handleCheck,
   selectedCuentaGmailId,
+  handleDeleteEmail,
 }: {
   list: IDataEmail;
   initLoading: boolean;
@@ -143,6 +146,7 @@ const ListEmails = ({
   handleSearchTermChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleCheck: (value: string) => void;
   selectedCuentaGmailId: string | null;
+  handleDeleteEmail: (emailId: string) => void;
 }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
@@ -161,6 +165,7 @@ const ListEmails = ({
   const columns = Tabs({
     selectedCuentaGmailId: selectedCuentaGmailId,
     onClickSync: () => handleSync(selectedCuentaGmailId as string),
+    handleDeleteEmail,
   });
 
   return (

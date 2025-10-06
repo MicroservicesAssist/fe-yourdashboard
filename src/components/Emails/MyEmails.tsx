@@ -36,6 +36,7 @@ const MyEmails = ({
     searchTerm,
     viewAll,
     handleViewAll,
+    handleDeleteEmail,
   } = useEmails(cuentasGmail, userId);
 
   const conectEmail = async () => {
@@ -86,6 +87,7 @@ const MyEmails = ({
             handleSearchTermChange={handleSearchTermChange}
             handleCheck={handleCheck}
             selectedCuentaGmailId={selectedCuentaGmailId}
+            handleDeleteEmail={handleDeleteEmail}
           />
         )}
       </div>
