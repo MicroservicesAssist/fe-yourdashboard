@@ -29,6 +29,10 @@ const Navbar = () => {
     router.push("/auth");
   };
 
+  const handleProfile = () => {
+    router.push("/dashboard/profile");
+  };
+
   const isLoggedIn = !!accessToken;
 
   const loggedInItems: MenuProps["items"] = [
@@ -36,7 +40,7 @@ const Navbar = () => {
       key: "1",
       label: "Perfil",
       icon: <UserOutlined />,
-      disabled: true,
+      onClick: handleProfile,
     },
     {
       type: "divider",

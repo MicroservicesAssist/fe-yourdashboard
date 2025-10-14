@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Edit2,
   Trash2,
@@ -8,6 +9,8 @@ import {
   Mail,
   FileText,
   Video,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 
 interface EventDetailsModalProps {
@@ -25,6 +28,8 @@ export default function EventDetailsModal({
   onEdit,
   onDelete,
 }: EventDetailsModalProps) {
+  const [showAttendees, setShowAttendees] = useState(false);
+
   if (!visible || !event) return null;
 
   const extractMeetingLink = (description: string) => {
@@ -57,12 +62,21 @@ export default function EventDetailsModal({
   };
 
   const attendeesList = event.attendees || [];
-  const acceptedCount = attendeesList.filter(
-    (a: any) => a.status === "accepted"
-  ).length;
-  const pendingCount = attendeesList.filter(
-    (a: any) => a.status === "pending"
-  ).length;
+
+  // Los attendees pueden ser strings (emails) u objetos
+  const processedAttendees = attendeesList.map((attendee: any) => {
+    if (typeof attendee === "string") {
+      // Si es un string, es solo el email
+      return {
+        email: attendee,
+        displayName: null,
+        status: null,
+        organizer: false,
+      };
+    }
+    // Si es un objeto, usarlo tal cual
+    return attendee;
+  });
 
   return (
     <div className="modal-overlay">
@@ -112,24 +126,66 @@ export default function EventDetailsModal({
           )}
 
           {attendeesList.length > 0 && (
-            <div className="detail-row">
+            <div className="detail-row attendees-row">
               <Users size={20} />
               <div className="detail-content">
                 <div className="attendees-summary">
-                  {attendeesList.length} invitados
+                  {attendeesList.length} invitado
+                  {attendeesList.length > 1 ? "s" : ""}
                 </div>
-                {acceptedCount > 0 && (
-                  <div className="attendees-status">{acceptedCount} sí</div>
-                )}
-                {pendingCount > 0 && (
-                  <div className="attendees-status">
-                    {pendingCount} en espera
-                  </div>
-                )}
               </div>
-              <button className="expand-btn">
-                <Mail size={18} />
+              <button
+                className="expand-btn"
+                onClick={() => setShowAttendees(!showAttendees)}
+              >
+                {showAttendees ? (
+                  <ChevronUp size={18} />
+                ) : (
+                  <ChevronDown size={18} />
+                )}
               </button>
+            </div>
+          )}
+
+          {showAttendees && attendeesList.length > 0 && (
+            <div className="attendees-list">
+              {processedAttendees.map((attendee: any, index: number) => {
+                const getInitial = () => {
+                  if (attendee.displayName && attendee.displayName.length > 0) {
+                    return attendee.displayName.charAt(0).toUpperCase();
+                  }
+                  if (attendee.email && attendee.email.length > 0) {
+                    return attendee.email.charAt(0).toUpperCase();
+                  }
+                  return "?";
+                };
+
+                const isOrganizer = attendee.organizer === true;
+                const hasName =
+                  attendee.displayName &&
+                  attendee.displayName !== attendee.email;
+
+                return (
+                  <div key={index} className="attendee-item">
+                    <div className="attendee-avatar">{getInitial()}</div>
+                    <div className="attendee-info">
+                      {hasName ? (
+                        <>
+                          <div className="attendee-name">
+                            {attendee.displayName}
+                          </div>
+                          <div className="attendee-email">{attendee.email}</div>
+                        </>
+                      ) : (
+                        <div className="attendee-name">{attendee.email}</div>
+                      )}
+                      {isOrganizer && (
+                        <div className="organizer-badge">Organizador</div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
 
@@ -297,6 +353,17 @@ export default function EventDetailsModal({
           border-bottom: 1px solid #f0f2f5;
         }
 
+        .detail-row.attendees-row {
+          cursor: pointer;
+          transition: background 0.2s;
+          margin: 0 -24px;
+          padding: 16px 24px;
+        }
+
+        .detail-row.attendees-row:hover {
+          background: #f8f9fa;
+        }
+
         .detail-row:last-child {
           border-bottom: none;
         }
@@ -316,12 +383,6 @@ export default function EventDetailsModal({
         .attendees-summary {
           font-weight: 500;
           color: #1a202c;
-          margin-bottom: 4px;
-        }
-
-        .attendees-status {
-          font-size: 13px;
-          color: #718096;
         }
 
         .expand-btn {
@@ -340,6 +401,76 @@ export default function EventDetailsModal({
         .expand-btn:hover {
           background: #f0f2f5;
           color: #344bff;
+        }
+
+        .attendees-list {
+          background: #f8f9fa;
+          border-radius: 8px;
+          padding: 12px;
+          margin: -8px 0 16px 0;
+          border: 1px solid #e8ecef;
+        }
+
+        .attendee-item {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 12px;
+          background: white;
+          border-radius: 6px;
+          margin-bottom: 8px;
+          transition: all 0.2s;
+        }
+
+        .attendee-item:last-child {
+          margin-bottom: 0;
+        }
+
+        .attendee-item:hover {
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .attendee-avatar {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-weight: 600;
+          font-size: 16px;
+          flex-shrink: 0;
+        }
+
+        .attendee-info {
+          flex: 1;
+          min-width: 0;
+        }
+
+        .attendee-name {
+          font-weight: 500;
+          color: #1a202c;
+          font-size: 14px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .attendee-email {
+          font-size: 13px;
+          color: #718096;
+          margin-top: 2px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .organizer-badge {
+          font-size: 12px;
+          color: #718096;
+          margin-top: 2px;
         }
 
         .details-footer {

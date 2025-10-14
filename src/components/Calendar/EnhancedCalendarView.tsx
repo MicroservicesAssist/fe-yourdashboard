@@ -12,6 +12,7 @@ import { useCalendarData } from "./hooks/useCalendarData";
 import { useCalendarEvents } from "./hooks/useCalendarEvents";
 import EventCreateModal from "./EventCreateModal";
 import EventDetailsModal from "./EventDetailsModalNew";
+import { SearchResultsModal } from "./SearchResultsModal";
 
 const EnhancedCalendarView: React.FC<CalendarViewProps> = ({
   accountId,
@@ -29,6 +30,11 @@ const EnhancedCalendarView: React.FC<CalendarViewProps> = ({
   const [detailsModalVisible, setDetailsModalVisible] = useState(false);
   const [modalMode, setModalMode] = useState<"create" | "edit">("create");
 
+  // Estados para búsqueda
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchModalVisible, setSearchModalVisible] = useState(false);
+  const [lastSearchTerm, setLastSearchTerm] = useState("");
+
   const viewOptions = [
     { label: "Día", value: "timeGridDay" },
     { label: "Semana", value: "timeGridWeek" },
@@ -44,6 +50,9 @@ const EnhancedCalendarView: React.FC<CalendarViewProps> = ({
     error,
     loadEvents,
     hasAccount,
+    searchLoading,
+    searchEvents,
+    clearSearch,
   } = useCalendarData(accountId, showUnified);
 
   const {
@@ -55,17 +64,15 @@ const EnhancedCalendarView: React.FC<CalendarViewProps> = ({
     deleting,
   } = useCalendarEvents(accountId);
 
-  // 🔧 Cargar eventos SOLO UNA VEZ al inicio o cuando cambie la cuenta
   useEffect(() => {
     if (hasAccount) {
       const now = dayjs();
       const startDate = now.subtract(6, "month").startOf("month").toISOString();
       const endDate = now.add(6, "months").endOf("month").toISOString();
-
       console.log("📅 Cargando eventos iniciales:", { startDate, endDate });
       loadEvents(startDate, endDate);
     }
-  }, [hasAccount, accountId, showUnified]); // 🔧 Solo dependencias estables
+  }, [hasAccount, accountId, showUnified]);
 
   useEffect(() => {
     updateCurrentDate();
@@ -110,12 +117,81 @@ const EnhancedCalendarView: React.FC<CalendarViewProps> = ({
     updateCurrentDate();
   };
 
+  const handleToday = () => {
+    const calendarApi = calendarRef.current?.getApi();
+    if (calendarApi) {
+      calendarApi.today();
+      updateCurrentDate();
+    }
+  };
+
   const refreshEvents = async () => {
     if (hasAccount) {
       const now = dayjs();
       const startDate = now.subtract(6, "month").startOf("month").toISOString();
       const endDate = now.add(6, "months").endOf("month").toISOString();
       await loadEvents(startDate, endDate);
+    }
+  };
+
+  // Función para buscar eventos
+  const handleSearch = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      const term = searchTerm.trim();
+      if (!term) {
+        clearSearch();
+        setSearchModalVisible(false);
+        return;
+      }
+
+      try {
+        const startDate = dayjs()
+          .subtract(1, "year")
+          .startOf("day")
+          .toISOString();
+        await searchEvents(term, startDate, 1, 50);
+        setLastSearchTerm(term);
+        setSearchModalVisible(true);
+      } catch (error) {
+        console.error("Error en búsqueda:", error);
+        message.error("Error al buscar eventos");
+      }
+    }
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+
+    if (!value) {
+      clearSearch();
+      setSearchModalVisible(false);
+    }
+  };
+
+  // Función para navegar al evento seleccionado desde la búsqueda
+  const handleEventSelectFromSearch = (event: any) => {
+    setSearchModalVisible(false);
+    setSearchTerm("");
+
+    // Navegar a la fecha del evento
+    const calendarApi = calendarRef.current?.getApi();
+    if (calendarApi && event.startTime) {
+      const eventDate = new Date(event.startTime);
+      calendarApi.gotoDate(eventDate);
+
+      // Cambiar a vista de semana si está en mes o año
+      const currentView = calendarApi.view.type;
+      if (currentView === "dayGridMonth" || currentView === "dayGridYear") {
+        calendarApi.changeView("timeGridWeek");
+        setViewType("Semana");
+      }
+
+      // Mostrar detalles del evento después de un breve delay
+      setTimeout(() => {
+        setSelectedEvent(event);
+        setDetailsModalVisible(true);
+      }, 300);
     }
   };
 
@@ -288,6 +364,9 @@ const EnhancedCalendarView: React.FC<CalendarViewProps> = ({
                   />
                 </svg>
               </button>
+              <button onClick={handleToday} className="today-btn-new">
+                Hoy
+              </button>
               <span className="current-date-new">{currentDate}</span>
             </div>
           </div>
@@ -311,7 +390,15 @@ const EnhancedCalendarView: React.FC<CalendarViewProps> = ({
                 type="text"
                 placeholder="Buscar evento, usuario..."
                 className="search-input-new"
+                value={searchTerm}
+                onChange={handleSearchChange}
+                onKeyDown={handleSearch}
               />
+              {searchLoading && (
+                <div className="search-loading">
+                  <Spin size="small" />
+                </div>
+              )}
             </div>
           </div>
 
@@ -472,6 +559,19 @@ const EnhancedCalendarView: React.FC<CalendarViewProps> = ({
         onDelete={handleDeleteEvent}
       />
 
+      <SearchResultsModal
+        visible={searchModalVisible}
+        onCancel={() => {
+          setSearchModalVisible(false);
+          setSearchTerm("");
+        }}
+        searchTerm={lastSearchTerm}
+        results={events}
+        loading={searchLoading}
+        onEventSelect={handleEventSelectFromSearch}
+        showUnified={showUnified}
+      />
+
       <style jsx global>{`
         .calendar-container-new {
           width: 100%;
@@ -542,6 +642,32 @@ const EnhancedCalendarView: React.FC<CalendarViewProps> = ({
           background: #f0f2ff;
         }
 
+        .today-btn-new {
+          padding: 6px 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid #e8ecef;
+          background: white;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: all 0.2s;
+          color: #4a5568;
+          font-size: 14px;
+          font-weight: 500;
+          white-space: nowrap;
+        }
+
+        .today-btn-new:hover {
+          border-color: #344bff;
+          color: #344bff;
+          background: #f0f2ff;
+        }
+
+        .today-btn-new:active {
+          transform: scale(0.98);
+        }
+
         .current-date-new {
           font-size: 16px;
           font-weight: 600;
@@ -566,6 +692,7 @@ const EnhancedCalendarView: React.FC<CalendarViewProps> = ({
           top: 50%;
           transform: translateY(-50%);
           color: #a0aec0;
+          pointer-events: none;
         }
 
         .search-input-new {
@@ -585,6 +712,13 @@ const EnhancedCalendarView: React.FC<CalendarViewProps> = ({
         .search-input-new:focus {
           border-color: #344bff;
           box-shadow: 0 0 0 3px rgba(52, 75, 255, 0.1);
+        }
+
+        .search-loading {
+          position: absolute;
+          right: 12px;
+          top: 50%;
+          transform: translateY(-50%);
         }
 
         .header-right-new {
