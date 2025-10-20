@@ -149,7 +149,7 @@ const AccountManager = ({
             <Option key={account.id} value={account.id.toString()}>
               <Space>
                 📅 {account.alias_personalizado || account.email_gmail}
-                <Tag size="small" color={account.esta_activa ? "green" : "red"}>
+                <Tag color={account.esta_activa ? "green" : "red"}>
                   {account.esta_activa ? "Activa" : "Inactiva"}
                 </Tag>
               </Space>
