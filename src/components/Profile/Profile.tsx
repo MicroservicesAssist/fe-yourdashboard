@@ -23,8 +23,6 @@ import {
   CameraOutlined,
   UploadOutlined,
   WhatsAppOutlined,
-  CalendarOutlined,
-  CloseCircleOutlined,
   CheckCircleOutlined,
 } from "@ant-design/icons";
 import type { TabsProps, UploadProps } from "antd";
@@ -38,7 +36,7 @@ const ProfileClient = () => {
     useState(false);
 
   // Mock data
-  const [userData, setUserData] = useState({
+  const [userData] = useState({
     nombre: "Nombres Apellidos",
     telefono: "00000000",
     email: "usuario@gmail.com",
