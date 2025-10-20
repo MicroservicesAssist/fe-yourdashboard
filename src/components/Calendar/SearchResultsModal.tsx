@@ -20,7 +20,7 @@ import {
 import { CalendarEvent } from "@/interfaces/interfacesCalendar";
 import dayjs from "dayjs";
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
 interface SearchResultsModalProps {
   visible: boolean;
@@ -110,7 +110,7 @@ export const SearchResultsModal: React.FC<SearchResultsModalProps> = ({
           Resultados de búsqueda
           {searchTerm && (
             <Text type="secondary" style={{ marginLeft: 8, fontSize: "14px" }}>
-              para "{searchTerm}"
+              para {searchTerm}
             </Text>
           )}
         </div>
@@ -206,19 +206,19 @@ export const SearchResultsModal: React.FC<SearchResultsModalProps> = ({
                       </span>
 
                       {isPast && (
-                        <Tag color="default" size="small">
+                        <Tag color="default" style={{ fontSize: "small" }}>
                           Pasado
                         </Tag>
                       )}
 
                       {showUnified && event.sourceAccount && (
-                        <Tag color="blue" size="small">
+                        <Tag color="blue" style={{ fontSize: "small" }}>
                           {event.sourceAccount}
                         </Tag>
                       )}
 
                       {event.isPrivate && (
-                        <Tag color="orange" size="small">
+                        <Tag color="orange" style={{ fontSize: "small" }}>
                           Privado
                         </Tag>
                       )}
@@ -326,7 +326,7 @@ export const SearchResultsModal: React.FC<SearchResultsModalProps> = ({
           description={
             <div>
               <div style={{ marginBottom: 8 }}>
-                No se encontraron eventos para "{searchTerm}"
+                No se encontraron eventos para {searchTerm}
               </div>
               <Text type="secondary" style={{ fontSize: "12px" }}>
                 Intenta con otros términos de búsqueda
