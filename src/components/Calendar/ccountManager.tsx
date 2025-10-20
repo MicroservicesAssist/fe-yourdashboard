@@ -21,8 +21,7 @@ const AccountManager = ({
   selectedAccountId,
   showUnifiedOption = true,
 }: AccountManagerProps) => {
-  const { userProfile, setUserProfile, clearAuth, getGmailAccounts } =
-    useAuthStore();
+  const { setUserProfile, clearAuth, getGmailAccounts } = useAuthStore();
   const router = useRouter();
   const [disconnecting, setDisconnecting] = useState<string | null>(null);
 
