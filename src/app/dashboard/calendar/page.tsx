@@ -24,7 +24,7 @@ export default function CalendarioPage() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [selectedAccountId, setSelectedAccountId] = useState<string>("");
-  const [showUnified, setShowUnified] = useState(false);
+  const [showUnified] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
