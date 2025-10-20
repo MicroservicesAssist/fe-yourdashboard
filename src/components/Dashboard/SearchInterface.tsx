@@ -1,4 +1,3 @@
-// src/components/Dashboard/SearchInterface.tsx
 "use client";
 
 import React, { useState } from "react";
