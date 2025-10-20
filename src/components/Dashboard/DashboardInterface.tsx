@@ -884,20 +884,7 @@ import { getUpcomingEvents } from "@/services/calendar/calendarService";
 
 const { Title, Text } = Typography;
 
-// Interfaces
-interface GmailAccount {
-  id: number;
-  email: string;
-  nombre?: string;
-}
-
-interface UserProfile {
-  id: number;
-  nombre?: string;
-  email?: string;
-  cuentas_gmail?: GmailAccount[];
-}
-
+// Tipos para los datos de respuesta
 interface Email {
   id: string;
   subject: string;
@@ -1061,14 +1048,9 @@ const SuccessNotification = ({
 };
 
 // Componente para la card de Email
-const EmailCard = ({
-  userProfile,
-  onConnect,
-}: {
-  userProfile: UserProfile | null;
-  onConnect: () => void;
-}) => {
+const EmailCard = ({ onConnect }: { onConnect: () => void }) => {
   const router = useRouter();
+  const { userProfile } = useAuthStore();
   const [recentEmails, setRecentEmails] = useState<Email[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -1250,14 +1232,9 @@ const EmailCard = ({
 };
 
 // Componente para la card de Calendario
-const CalendarCard = ({
-  userProfile,
-  onConnect,
-}: {
-  userProfile: UserProfile | null;
-  onConnect: () => void;
-}) => {
+const CalendarCard = ({ onConnect }: { onConnect: () => void }) => {
   const router = useRouter();
+  const { userProfile } = useAuthStore();
   const [upcomingEvents, setUpcomingEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -1714,16 +1691,10 @@ const DashboardInterface = () => {
           {/* Cards Grid */}
           <Row gutter={[24, 24]}>
             <Col xs={24} lg={12}>
-              <EmailCard
-                userProfile={userProfile}
-                onConnect={() => showNotification("email")}
-              />
+              <EmailCard onConnect={() => showNotification("email")} />
             </Col>
             <Col xs={24} lg={12}>
-              <CalendarCard
-                userProfile={userProfile}
-                onConnect={() => showNotification("calendar")}
-              />
+              <CalendarCard onConnect={() => showNotification("calendar")} />
             </Col>
             <Col xs={24} lg={12}>
               <WhatsAppCard onConnect={() => showNotification("whatsapp")} />
