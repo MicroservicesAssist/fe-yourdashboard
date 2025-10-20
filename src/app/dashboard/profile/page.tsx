@@ -1,17 +1,3 @@
-// import React from "react";
-// import { Layout } from "antd";
-// import Navbar from "@/components/Layout/Navbar";
-// import ProfileClient from "@/components/Profile/Profile";
-
-// export default function PerfilPage() {
-//   return (
-//     <Layout style={{ minHeight: "100vh", backgroundColor: "#F5F5F5" }}>
-//       <Navbar />
-//       <ProfileClient />
-//     </Layout>
-//   );
-// }
-
 //!!!!!!!!!!!!!!!!!!!!!!!! Esta manera es provicional
 "use client";
 
