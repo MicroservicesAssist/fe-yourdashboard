@@ -1,4 +1,3 @@
-// src/app/dashboard/layout.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -19,9 +18,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const router = useRouter();
   const [isHydrated, setIsHydrated] = useState(false);
 
-  // Determinar el item activo basado en la ruta actual
   const getActiveMenuItem = () => {
-    if (pathname.startsWith("/dashboard/search")) return "buscador"; // 👈 Agregado
+    if (pathname.startsWith("/dashboard/search")) return "buscador";
     if (pathname.startsWith("/dashboard/calendar")) return "calendario";
     if (pathname.startsWith("/dashboard/email")) return "correo";
     if (pathname.startsWith("/dashboard/whatsapp")) return "whatsapp";
@@ -31,7 +29,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
   const [activeMenuItem, setActiveMenuItem] = useState(getActiveMenuItem());
 
-  // Actualizar el item activo cuando cambia la ruta
   useEffect(() => {
     setActiveMenuItem(getActiveMenuItem());
   }, [pathname]);
@@ -40,13 +37,12 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     setIsHydrated(true);
   }, []);
 
-  // Manejar el click en los items del menú
   const handleMenuItemClick = (key: string) => {
     setActiveMenuItem(key);
 
     switch (key) {
       case "buscador":
-        router.push("/dashboard/search"); // 👈 Cambiado
+        router.push("/dashboard/search");
         break;
       case "dashboard":
         router.push("/dashboard");
