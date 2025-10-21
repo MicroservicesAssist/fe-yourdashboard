@@ -1,4 +1,3 @@
-// app/dashboard/profile/ProfileLayout.tsx
 "use client";
 
 import React from "react";
