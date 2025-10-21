@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useState, Suspense } from "react";
-import { Layout, Spin } from "antd";
+import React, { useEffect, useState } from "react";
+import { Layout } from "antd";
 import "../globals.css";
 import Navbar from "@/components/Layout/Navbar";
 import SidebarMenu from "@/components/Dashboard/SidebarMenu";
@@ -12,13 +12,6 @@ const { Content, Sider } = Layout;
 interface DashboardLayoutProps {
   children: React.ReactNode;
 }
-
-// Componente de loading para el Suspense
-const DashboardLoading = () => (
-  <div className="flex items-center justify-center min-h-screen">
-    <Spin size="large" />
-  </div>
-);
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const pathname = usePathname();
@@ -44,12 +37,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     setIsHydrated(true);
   }, []);
 
+  // Manejar el click en los items del menú
   const handleMenuItemClick = (key: string) => {
     setActiveMenuItem(key);
 
     switch (key) {
       case "buscador":
-        router.push("/dashboard/search");
+        router.push("/dashboard/search"); // 👈 Cambiado
         break;
       case "dashboard":
         router.push("/dashboard");
@@ -105,7 +99,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           />
         </Sider>
 
-        {/* Contenido principal con Suspense */}
+        {/* Contenido principal */}
         <Layout style={{ marginLeft: 260 }}>
           <Content
             style={{
@@ -113,7 +107,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
               minHeight: "calc(100vh - 86px)",
             }}
           >
-            <Suspense fallback={<DashboardLoading />}>{children}</Suspense>
+            {children}
           </Content>
         </Layout>
       </Layout>
